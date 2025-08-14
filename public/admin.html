@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ISTE Treasure Hunt — Coordinator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-user-shield"></i>
+          <div>
+            <h1>Coordinator Dashboard</h1>
+            <div class="tagline">Admin only</div>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card" id="loginCard">
+      <div class="card-header">
+        <i class="fas fa-lock"></i>
+        <h2 class="card-title">Login</h2>
+      </div>
+      <div class="form-group"><label>Email</label><input id="email" placeholder="email" /></div>
+      <div class="form-group"><label>Password</label><input id="password" type="password" placeholder="password" /></div>
+      <button class="btn btn-primary" id="loginBtn">Login</button>
+      <div id="loginMsg" class="status" style="display:none"></div>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+      <div class="view-toggle">
+        <div class="view-btn active" data-view="teams">All Teams</div>
+        <div class="view-btn" data-view="checkpoints">Checkpoints & Tasks</div>
+        <div class="view-btn" data-view="scoreboard">Score Board</div>
+      </div>
+
+      <div id="teams-view">
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-users"></i>
+            <h2 class="card-title">Team Progress Overview</h2>
+            <button class="btn btn-warning" id="resetAll"><i class="fas fa-sync-alt"></i> Reset All</button>
+          </div>
+          <div class="team-grid" id="teamGrid"></div>
+        </div>
+      </div>
+
+      <div id="checkpoints-view" style="display:none;">
+        <div id="tasksWrap"></div>
+      </div>
+
+      <div id="scores-view" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <i class="fas fa-trophy"></i>
+            <h2 class="card-title">Score Board</h2>
+          </div>
+          <table class="score-table" id="scoreTable">
+            <thead><tr><th>Team</th><th>Checkpoints</th><th>Time</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer><div class="container"><p>Admin • Keep PINs secret</p></div></footer>
+
+  <script>
+    const API = '';
+    const socket = io(API || undefined);
+    const loginCard = document.getElementById('loginCard');
+    const adminPanel = document.getElementById('adminPanel');
+    let token = localStorage.getItem('adminToken');
+
+    function authHeaders() { return token ? { Authorization: `Bearer ${token}` } : {}; }
+
+    function setAuthedUI() {
+      if (token) { loginCard.style.display = 'none'; adminPanel.style.display = ''; }
+      else { loginCard.style.display = ''; adminPanel.style.display = 'none'; }
+    }
+
+    // View toggles
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const teamsView = document.getElementById('teams-view');
+    const checkpointsView = document.getElementById('checkpoints-view');
+    const scoresView = document.getElementById('scores-view');
+    viewBtns.forEach(vb => vb.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('active'));
+      vb.classList.add('active');
+      const key = vb.getAttribute('data-view');
+      teamsView.style.display = (key==='teams') ? '' : 'none';
+      checkpointsView.style.display = (key==='checkpoints') ? '' : 'none';
+      scoresView.style.display = (key==='scoreboard') ? '' : 'none';
+    }));
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('loginMsg');
+      const res = await fetch(`${API}/api/admin/login`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password })
+      }).then(r=>r.json());
+      if (res.token) {
+        token = res.token;
+        localStorage.setItem('adminToken', token);
+        msg.style.display='none';
+        setAuthedUI();
+        await renderAll();
+      } else {
+        msg.textContent = res.error || 'Login failed';
+        msg.className = 'status error'; msg.style.display='block';
+      }
+    }
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      token = null; localStorage.removeItem('adminToken'); setAuthedUI();
+    });
+
+    async function overview() {
+      return fetch(`${API}/api/admin/overview`, { headers: authHeaders() }).then(r=>r.json());
+    }
+
+    async function renderTeamsGrid(data) {
+      const grid = document.getElementById('teamGrid');
+      const byTeam = data.routes.reduce((acc, r) => { (acc[r.team_id] ||= []).push(r); return acc; }, {});
+      const parts = data.teams.map(t => {
+        const route = (byTeam[t.id] || []).sort((a,b)=>a.position-b.position);
+        const total = route.length;
+        const completed = Math.min(t.current_index, total);
+        const checkpoints = route.map(r => `
+          <div class="checkpoint-item">
+            <div class="checkpoint-info">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>${r.location_id}</span>
+            </div>
+            <div class="checkpoint-status ${r.position < t.current_index ? 'completed' : (r.position===t.current_index ? 'pending' : 'locked')}">
+              <i class="fas ${r.position < t.current_index ? 'fa-check-circle' : (r.position===t.current_index ? 'fa-hourglass-half' : 'fa-lock')}"></i>
+              <span>${r.position < t.current_index ? 'Done' : (r.position===t.current_index ? 'Current' : 'Pending')}</span>
+            </div>
+          </div>
+        `).join('');
+        return `
+          <div class="team-card">
+            <div class="team-header">
+              <div class="team-name">${t.name}</div>
+              <span class="badge ${t.finished_at?'badge-success':'badge-primary'}">${t.finished_at?'Finished':'In Progress'}</span>
+            </div>
+            <div class="team-stats">
+              <div class="stat">
+                <div class="stat-value">${completed}/${total}</div>
+                <div class="stat-label">Checkpoints</div>
+              </div>
+              <div class="stat">
+                <button class="btn btn-warning" onclick="resetTeam('${t.id}')"><i class="fas fa-undo"></i> Reset</button>
+              </div>
+            </div>
+            <div class="checkpoint-list">${checkpoints}</div>
+          </div>
+        `;
+      }).join('');
+      grid.innerHTML = parts;
+    }
+
+    async function renderTasks(data) {
+      const wrap = document.getElementById('tasksWrap');
+      const byLoc = data.tasks.reduce((acc, t) => { (acc[t.location_id] ||= []).push(t); return acc; }, {});
+      const parts = Object.keys(byLoc).sort().map(locId => {
+        const items = byLoc[locId].map(t => `
+          <div class="task-card">
+            <div class="task-title">${t.name}</div>
+            <div class="task-instructions">${t.instructions}</div>
+            <div class="task-proof"><strong>Proof:</strong> ${t.proof}</div>
+            <div class="form-group">
+              <label>PIN</label>
+              <input type="text" class="editable-field" value="${t.pin}" onchange="updatePin(${t.id}, this.value)" />
+            </div>
+          </div>
+        `).join('');
+        return `
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-map-marker-alt"></i>
+              <h3 class="card-title">${locId}</h3>
+              <span class="badge badge-primary">${(data.locations.find(l => l.id===locId)||{}).type || ''}</span>
+            </div>
+            ${items}
+          </div>
+        `;
+      }).join('');
+      wrap.innerHTML = parts;
+    }
+
+    async function renderScoreboard() {
+      const tbody = document.querySelector('#scoreTable tbody');
+      const sb = await fetch(`${API}/api/scoreboard`).then(r=>r.json());
+      tbody.innerHTML = sb.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td>${r.progress}</td>
+          <td class="time-display">${r.time}</td>
+          <td><span class="badge ${r.status==='Finished'?'badge-success':'badge-primary'}">${r.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    async function updatePin(taskId, pin) {
+      await fetch(`${API}/api/admin/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json', ...authHeaders() },
+        body: JSON.stringify({ pin })
+      });
+    }
+
+    async function resetTeam(teamId) {
+      if (!confirm(`Reset ${teamId}?`)) return;
+      await fetch(`${API}/api/admin/reset`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', ...authHeaders() },
+        body: JSON.stringify({ teamId })
+      });
+      await renderAll();
+    }
+    document.getElementById('resetAll').addEventListener('click', async () => {
+      if (!confirm('Reset ALL teams?')) return;
+      await fetch(`${API}/api/admin/reset`, {
+        method:'POST', headers:{ 'Content-Type':'application/json', ...authHeaders() },
+        body: JSON.stringify({})
+      });
+      await renderAll();
+    });
+
+    async function renderAll() {
+      const data = await overview();
+      await renderTeamsGrid(data);
+      await renderTasks(data);
+      await renderScoreboard();
+    }
+
+    // socket events
+    socket.on('scoreboard:update', renderAll);
+    socket.on('scoreboard:reset', renderAll);
+    socket.on('admin:tasks:update', renderAll);
+
+    // init
+    setAuthedUI();
+    if (token) { renderAll(); }
+    window.resetTeam = resetTeam;
+    window.updatePin = updatePin;
+  </script>
+</body>
+</html>
