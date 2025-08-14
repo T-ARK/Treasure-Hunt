@@ -1,0 +1,114 @@
+{
+  "LOCATIONS": {
+    "LIB_A": { "id": "LIB_A", "title": "Library – Block A", "block": "A", "type": "Library" },
+    "DRAW_A": { "id": "DRAW_A", "title": "Drawing Room – Block A", "block": "A", "type": "Room" },
+    "LAB_DS": { "id": "LAB_DS", "title": "Data Science Lab – Block A", "block": "A", "type": "Computer Lab" },
+    "LAB_P1": { "id": "LAB_P1", "title": "Programming Lab 1 – Block A", "block": "A", "type": "Computer Lab" },
+    "LAB_P2": { "id": "LAB_P2", "title": "Programming Lab 2 – Block A", "block": "A", "type": "Computer Lab" },
+    "HALL_A1": { "id": "HALL_A1", "title": "Seminar Hall 1 – Block A", "block": "A", "type": "Hall" },
+    "HALL_A2": { "id": "HALL_A2", "title": "Seminar Hall 2 – Block A", "block": "A", "type": "Hall" },
+    "HALL_C3": { "id": "HALL_C3", "title": "Seminar Hall 3 – Block C", "block": "C", "type": "Hall" },
+    "CANT_B": { "id": "CANT_B", "title": "Canteen – Block B", "block": "B", "type": "Canteen" },
+    "CANT_C": { "id": "CANT_C", "title": "Canteen – Block C", "block": "C", "type": "Canteen" },
+    "NB_A1": { "id": "NB_A1", "title": "Notice Board 1 – Block A", "block": "A", "type": "Notice Board" },
+    "NB_A2": { "id": "NB_A2", "title": "Notice Board 2 – Block A", "block": "A", "type": "Notice Board" },
+    "NB_A3": { "id": "NB_A3", "title": "Notice Board 3 – Block A", "block": "A", "type": "Notice Board" },
+    "NB_A4": { "id": "NB_A4", "title": "Notice Board 4 – Block A", "block": "A", "type": "Notice Board" },
+    "NB_A5": { "id": "NB_A5", "title": "Notice Board 5 – Block A", "block": "A", "type": "Notice Board" },
+    "NB_A6": { "id": "NB_A6", "title": "Notice Board 6 – Block A", "block": "A", "type": "Notice Board" }
+  },
+  "TASKS": {
+    "LIB_A": [
+      { "name": "Book Cipher", "instructions": "Find the marked book at shelf 'CS-01'. Decode: Page 42 → 5th word, Page 7 → 1st, Page 99 → 3rd, then anagram the four words to get a campus keyword. Show marshal.", "proof": "Show the four words + final keyword to marshal.", "pin": "1843" },
+      { "name": "Quiet Hunt", "instructions": "Locate a book whose author's initials match your team name initials. Take a silent 'reading circle' photo (no faces needed) and show to marshal.", "proof": "Photo + book spine.", "pin": "2961" },
+      { "name": "Index Race", "instructions": "Use the book index to find the definition of 'algorithm'. Copy exactly the first ten words by hand on the slip. No phones.", "proof": "Handwritten line shown to marshal.", "pin": "5308" }
+    ],
+    "DRAW_A": [
+      { "name": "One-Min Logo", "instructions": "As a team, sketch the ISTE logo in 60 seconds using only triangles. All team members must add at least one triangle.", "proof": "Completed sketch.", "pin": "4410" },
+      { "name": "Robot Charades", "instructions": "In absolute silence, act like a malfunctioning robot for 20 seconds while tracing a path on paper that spells a letter. Marshal must guess the letter.", "proof": "Marshal says the letter correctly.", "pin": "7724" },
+      { "name": "Blindfold Blueprint", "instructions": "One member is blindfolded and draws a simple house guided only by teammates' verbal directions (no pointing).", "proof": "Recognizable house sketch.", "pin": "0956" }
+    ],
+    "LAB_DS": [
+      { "name": "Cable Logic", "instructions": "On the table are 5 labeled cables (A–E). Arrange them so that 'binary' order (0=short,1=long) matches a given pattern on the card.", "proof": "Correct arrangement per marshal's key.", "pin": "6127" },
+      { "name": "Post-it Cluster", "instructions": "Group 7 tech terms into 2 clusters (Data vs. Model) using post-its. Explain your grouping in one sentence.", "proof": "Correct/acceptable clustering.", "pin": "3885" },
+      { "name": "Decode & Point", "instructions": "Given a printed line of 8-bit binary, convert to ASCII letters (use any method) and point to the next block mentioned.", "proof": "Correct block identified.", "pin": "4409" }
+    ],
+    "LAB_P1": [
+      { "name": "If-Else Relay", "instructions": "Marshal reads conditions (IF wearing glasses THEN clap twice; ELSE stomp once; IF wearing watch THEN spin). Team performs the right sequence.", "proof": "Correct sequence performed without error.", "pin": "1342" },
+      { "name": "Sort Yourselves", "instructions": "Sort the team by birthday month from Jan→Dec without speaking. When done, say the months in order.", "proof": "Correct order.", "pin": "5571" },
+      { "name": "Stack & Queue", "instructions": "Use cups to demonstrate PUSH, POP (stack) and ENQUEUE, DEQUEUE (queue). Marshal calls operations; perform live.", "proof": "Performed correctly.", "pin": "2090" }
+    ],
+    "LAB_P2": [
+      { "name": "Regex Hunt", "instructions": "On a printed sheet of random characters, circle all vowels that are immediately followed by a digit. Count aloud.", "proof": "Correct count.", "pin": "6815" },
+      { "name": "Binary Beat", "instructions": "Clap '1', stay silent '0' to perform this 16-bit rhythm. Teammate writes the bits they hear.", "proof": "Written bits match the card.", "pin": "7602" },
+      { "name": "Pointer Dance", "instructions": "Place arrows on the floor to form a cycle (A→B→C→A). Walk the cycle twice, then break it by removing one arrow to make a list.", "proof": "Cycle then linear list demonstrated.", "pin": "9988" }
+    ],
+    "CANT_B": [
+      { "name": "Human Wi‑Fi", "instructions": "Pose as a human Wi‑Fi icon (concentric arcs). Take a photo and show marshal (faces optional).", "proof": "Photo shown.", "pin": "4321" },
+      { "name": "Menu Cipher", "instructions": "Using the menu board, take the first letter of 6 different items to form a word related to tech. Read it aloud.", "proof": "Recognizable tech word.", "pin": "8703" },
+      { "name": "Under‑Table Quest", "instructions": "Find the sticker under a table with a shape. Recreate the shape using spoons/packets on top of the table.", "proof": "Shape matches.", "pin": "2146" }
+    ],
+    "CANT_C": [
+      { "name": "Snack Math", "instructions": "Pick any 3 snack prices. Add them. Map sum to letters (A1Z26). Say the 3-letter code.", "proof": "3-letter code correct.", "pin": "3024" },
+      { "name": "Queue Etiquette", "instructions": "Demonstrate a perfect queue: equal spacing, quiet, forward only when allowed. Hold 10 seconds.", "proof": "Marshal satisfied.", "pin": "5520" },
+      { "name": "Emoji Order", "instructions": "Given 6 printed emojis, arrange to tell a 'canteen' story. Narrate in one sentence.", "proof": "Coherent story.", "pin": "7719" }
+    ],
+    "HALL_A1": [
+      { "name": "Lightning Skit", "instructions": "Act out 'Inventing the light bulb' in 20 seconds without words. End with a freeze pose.", "proof": "Marshal amused (subjective but fair).", "pin": "6401" },
+      { "name": "Rebus Logic", "instructions": "Solve a printed rebus (e.g., 'R E A D I N G' stacked over 'ROOM') → 'Reading Room'. Explain answer.", "proof": "Correct explanation.", "pin": "9011" },
+      { "name": "Math→Word", "instructions": "Solve: (7×4) – 9 = ?. Map to letter via A1Z26. Combine with two more mini sums to form a 3-letter word.", "proof": "Word matches key.", "pin": "2654" }
+    ],
+    "HALL_A2": [
+      { "name": "Tongue Twister Relay", "instructions": "Each member says one word of a tongue twister in order without mistakes. Two retries max.", "proof": "Flawless round.", "pin": "8842" },
+      { "name": "Paper Tower", "instructions": "Build the tallest free‑standing paper tower in 2 minutes using 6 sheets and tape.", "proof": "Stands for 5 seconds.", "pin": "1190" },
+      { "name": "Echo Location", "instructions": "Marshal whispers a 5-word campus phrase. Team repeats exactly. (No recording.)", "proof": "Exact repeat.", "pin": "3356" }
+    ],
+    "HALL_C3": [
+      { "name": "Silent Sudoku Mini", "instructions": "Fill a 3×3 mini Sudoku from a printed card. No talking allowed.", "proof": "Correct grid.", "pin": "7440" },
+      { "name": "Tech Pictionary", "instructions": "Draw a 'Bluetooth' symbol without writing letters/numbers. Teammates must guess.", "proof": "Correct guess.", "pin": "5529" },
+      { "name": "Freeze Frame", "instructions": "Create a silent tableau of 'Teamwork'. Hold pose for 8 seconds.", "proof": "Pose held.", "pin": "6625" }
+    ],
+    "NB_A1": [
+      { "name": "Find the Tiny", "instructions": "Locate the micro-sticker '∆' on this board. Draw it 5× bigger on the slip.", "proof": "Scaled drawing.", "pin": "1408" },
+      { "name": "Word Sweep", "instructions": "From any 4 notices, grab the first letter of the first line to form a word.", "proof": "Word shown.", "pin": "5113" },
+      { "name": "Odd One Out", "instructions": "Given 5 small icons on a card, pin the odd one to the board and explain why.", "proof": "Reasonable explanation.", "pin": "8864" }
+    ],
+    "NB_A2": [
+      { "name": "Arrow Trail", "instructions": "Follow 3 tiny arrows on the board to a small circle. Copy the circle pattern.", "proof": "Pattern copied.", "pin": "3301" },
+      { "name": "Rhyme Time", "instructions": "Make a two-line rhyme using a word from a notice.", "proof": "Rhyme recited.", "pin": "2775" },
+      { "name": "Count & Tell", "instructions": "Count total sheets on this board and say it backwards.", "proof": "Correct count.", "pin": "9443" }
+    ],
+    "NB_A3": [
+      { "name": "Color Pick", "instructions": "Name all distinct paper colors on this board within 10 seconds.", "proof": "All colors named.", "pin": "5012" },
+      { "name": "Date Scan", "instructions": "Find the earliest date visible and say the exact day-month-year.", "proof": "Correct date.", "pin": "6821" },
+      { "name": "Font Spy", "instructions": "Identify a serif vs sans-serif head on the board. Point to both.", "proof": "Both identified.", "pin": "7130" }
+    ],
+    "NB_A4": [
+      { "name": "Corner Quest", "instructions": "There is a dot in one corner (tiny). Find and touch it simultaneously as a team.", "proof": "Team touching corner.", "pin": "4026" },
+      { "name": "Arrow Math", "instructions": "There are 3 arrows hidden. Sum their directions: up=+1, down=−1, left=+2, right=−2.", "proof": "Correct total.", "pin": "2650" },
+      { "name": "Missing Vowel", "instructions": "Pick a notice title and say it without vowels.", "proof": "Correct transformation.", "pin": "9399" }
+    ],
+    "NB_A5": [
+      { "name": "Sticker Grid", "instructions": "Find a 2×2 grid of tiny stickers (•• / ••). Recreate it on paper.", "proof": "Grid drawn.", "pin": "7750" },
+      { "name": "Hashtag Hunt", "instructions": "Find a # symbol anywhere on this board or notices. Point it out.", "proof": "Located.", "pin": "6201" },
+      { "name": "Palindrome", "instructions": "From any line on a notice, extract a 3-letter palindrome (e.g., 'aba').", "proof": "Palindrome shown.", "pin": "4312" }
+    ],
+    "NB_A6": [
+      { "name": "Right or Left", "instructions": "Count how many notices have right-aligned text. Say the number.", "proof": "Correct count.", "pin": "9042" },
+      { "name": "Icon Match", "instructions": "Find a phone/email icon. Mimic it as a pose.", "proof": "Pose matches.", "pin": "2585" },
+      { "name": "Tear Edge", "instructions": "Locate a torn edge notice. Estimate the missing area in squares (1 sq = your palm).", "proof": "Reasonable estimate.", "pin": "1177" }
+    ]
+  },
+  "ROUTES": {
+    "TEAM_01": ["HALL_A1", "LIB_A", "CANT_B", "LAB_P1", "NB_A3", "CANT_C", "HALL_C3"],
+    "TEAM_02": ["CANT_C", "DRAW_A", "NB_A2", "LAB_P2", "CANT_B", "HALL_A2", "LIB_A"],
+    "TEAM_03": ["HALL_A2", "NB_A1", "CANT_C", "LIB_A", "LAB_P1", "DRAW_A", "CANT_B"],
+    "TEAM_04": ["NB_A4", "LAB_DS", "HALL_A1", "CANT_B", "LIB_A", "HALL_C3", "CANT_C"],
+    "TEAM_05": ["LAB_P2", "HALL_C3", "CANT_B", "NB_A5", "DRAW_A", "LIB_A", "HALL_A2"],
+    "TEAM_06": ["NB_A6", "CANT_C", "HALL_A1", "LAB_DS", "CANT_B", "NB_A2", "LIB_A"],
+    "TEAM_07": ["CANT_B", "NB_A3", "LAB_P1", "HALL_A2", "LIB_A", "DRAW_A", "HALL_C3"],
+    "TEAM_08": ["DRAW_A", "LIB_A", "NB_A4", "CANT_C", "LAB_P2", "HALL_A1", "NB_A6"],
+    "TEAM_09": ["LAB_DS", "HALL_C3", "NB_A2", "LIB_A", "CANT_B", "LAB_P2", "NB_A5"],
+    "TEAM_10": ["NB_A1", "CANT_B", "DRAW_A", "HALL_A2", "LAB_P1", "CANT_C", "LIB_A"]
+  }
+}
