@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ISTE Freshers Treasure Hunt — Team</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-map-marked-alt"></i>
+          <div>
+            <h1>ISTE Freshers Treasure Hunt</h1>
+            <div class="tagline">Online • AI‑resistant • Human‑verified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-tab="team">Team View</button>
+      <button class="nav-tab" data-tab="scores">Score Board</button>
+    </div>
+
+    <div id="team-view">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-users"></i>
+          <h2 class="card-title">Team Dashboard</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="teamSelect">Select Your Team</label>
+          <select id="teamSelect"></select>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+          </div>
+          <div class="progress-label">
+            <span>Checkpoints Completed</span>
+            <span id="progressText">0/0</span>
+          </div>
+        </div>
+
+        <div id="currentCheckpoint"></div>
+
+        <div class="pin-section">
+          <h3>Unlock Next Clue</h3>
+          <p>After completing the task, ask the marshal for the 4-digit PIN.</p>
+
+          <div class="pin-input">
+            <input type="text" id="pin" maxlength="4" placeholder="••••" />
+            <button class="btn btn-primary" id="verify">
+              <i class="fas fa-lock-open"></i> Verify PIN
+            </button>
+          </div>
+
+          <div id="pinStatus" class="status" style="display:none;"></div>
+        </div>
+
+        <div id="nextLocation" style="display:none;"></div>
+      </div>
+    </div>
+
+    <div id="scores-view" style="display:none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-trophy"></i>
+          <h2 class="card-title">Score Board</h2>
+        </div>
+
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>Checkpoints</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="scoreBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>ISTE Freshers Treasure Hunt • Online • AI‑resistant • Human‑verified</p>
+    </div>
+  </footer>
+
+  <script>
+    const API = ''; // same origin
+    const socket = io(API || undefined);
+
+    const tabs = document.querySelectorAll('.nav-tab');
+    const teamView = document.getElementById('team-view');
+    const scoresView = document.getElementById('scores-view');
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const k = t.getAttribute('data-tab');
+      teamView.style.display = (k === 'team') ? '' : 'none';
+      scoresView.style.display = (k === 'scores') ? '' : 'none';
+    }));
+
+    const teamSelect = document.getElementById('teamSelect');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const currentCheckpoint = document.getElementById('currentCheckpoint');
+    const nextLocation = document.getElementById('nextLocation');
+    const pinStatus = document.getElementById('pinStatus');
+    const scoreBody = document.getElementById('scoreBody');
+
+    async function loadTeamsForSelect() {
+      const sb = await fetch(`${API}/api/scoreboard`).then(r=>r.json());
+      teamSelect.innerHTML = sb.map(t => `<option value="${t.teamId}">${t.name}</option>`).join('');
+      const saved = localStorage.getItem('currentTeamId');
+      if (saved && sb.find(t => t.teamId === saved)) teamSelect.value = saved;
+      else localStorage.setItem('currentTeamId', teamSelect.value);
+    }
+
+    async function renderTeamState() {
+      const teamId = teamSelect.value;
+      if (!teamId) return;
+      localStorage.setItem('currentTeamId', teamId);
+      const s = await fetch(`${API}/api/team/${teamId}/state`).then(r=>r.json());
+      const completed = s.currentIndex;
+      const total = s.total;
+      progressFill.style.width = total ? `${Math.round((completed/total)*100)}%` : '0%';
+      progressText.textContent = `${completed}/${total}`;
+
+      if (completed >= total) {
+        currentCheckpoint.innerHTML = `
+          <div class="task-card">
+            <div class="task-title">Route Complete 🎉</div>
+            <div class="task-instructions">Great job! Please report to the coordinators.</div>
+            <div class="task-proof"><strong>Status:</strong> Finished</div>
+          </div>`;
+        nextLocation.style.display = 'none';
+      } else {
+        const c = s.currentLocation;
+        currentCheckpoint.innerHTML = `
+          <div class="location-card">
+            <i class="fas fa-building location-icon"></i>
+            <div class="location-info">
+              <h3>Checkpoint ${completed+1} of ${total} — ${c.title}</h3>
+              <p>${c.type} • Block ${c.block}</p>
+            </div>
+            <span class="badge badge-primary">Current</span>
+          </div>
+          <div class="task-card">
+            <div class="task-title">What to do here</div>
+            <div class="task-instructions">Complete the marshal's task to receive a 4-digit PIN. Enter it below to unlock your next clue.</div>
+          </div>`;
+        nextLocation.style.display = 'none';
+      }
+      pinStatus.style.display = 'none';
+      document.getElementById('pin').value = '';
+    }
+
+    async function renderScoreboard() {
+      const sb = await fetch(`${API}/api/scoreboard`).then(r=>r.json());
+      scoreBody.innerHTML = sb.map(r => `
+        <tr>
+          <td>${r.name}</td>
+          <td>${r.progress}</td>
+          <td class="time-display">${r.time}</td>
+          <td><span class="badge ${r.status==='Finished'?'badge-success':'badge-primary'}">${r.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('verify').addEventListener('click', async () => {
+      const pinInput = document.getElementById('pin');
+      const pin = pinInput.value.replace(/\D/g,'').slice(0,4);
+      if (!/^\d{4}$/.test(pin)) {
+        pinStatus.textContent = 'Please enter a 4-digit PIN.';
+        pinStatus.className = 'status error'; pinStatus.style.display = 'block'; return;
+      }
+      const teamId = teamSelect.value;
+      const res = await fetch(`${API}/api/team/${teamId}/verify`, {
+        method: 'POST', headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ pin })
+      }).then(r=>r.json()).catch(()=>({ok:false,message:'Network error'}));
+      if (!res.ok) {
+        pinStatus.textContent = res.message || 'Incorrect PIN.';
+        pinStatus.className = 'status error'; pinStatus.style.display = 'block';
+      } else {
+        pinStatus.textContent = res.finished ? 'PIN verified ✅ Route complete!' : `PIN verified ✅ Next: ${res.nextLocation.title}`;
+        pinStatus.className = 'status success'; pinStatus.style.display = 'block';
+        await renderTeamState();
+        await renderScoreboard();
+        if (!res.finished) {
+          nextLocation.style.display = 'block';
+          nextLocation.innerHTML = `
+            <h3>Next Location</h3>
+            <div class="location-card">
+              <i class="fas fa-building location-icon"></i>
+              <div class="location-info">
+                <h3>${res.nextLocation.title}</h3>
+                <p>${res.nextLocation.type} • Block ${res.nextLocation.block}</p>
+              </div>
+              <span class="badge badge-primary">Next</span>
+            </div>`;
+        }
+      }
+      pinInput.value = '';
+    });
+
+    teamSelect.addEventListener('change', renderTeamState);
+
+    socket.on('scoreboard:update', () => { renderScoreboard(); if (teamSelect.value) renderTeamState(); });
+    socket.on('scoreboard:reset', () => { renderScoreboard(); if (teamSelect.value) renderTeamState(); });
+
+    (async function init() {
+      await loadTeamsForSelect();
+      await renderTeamState();
+      await renderScoreboard();
+    })();
+  </script>
+</body>
+</html>
